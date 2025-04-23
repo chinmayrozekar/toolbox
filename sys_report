@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Chinmay Rozekar
+# Last Modified: 04/23/2025
+# 
+
+kernel_version=$(uname -r)
+
+freemem=$(free -h | awk 'NR==2 {print $4}')
+
+home_freespace=$(df -h $HOME | awk 'NR==2 {print $4}')
+home_space_used=$(df -h $HOME | awk 'NR==2 {print $5}')
+home_space_used=${home_space_used//%/ }
+
+wv_freespace=$(df -h /wv/${USER} | awk 'NR==2 {print $4}')
+wv_space_used=$(df -h /wv/${USER} | awk 'NR==2 {print $5}')
+wv_space_used=${wv_space_used//%/ }
+
+wv_nobackup_freespace=$( df -h /wv/${USER}_nobackup | awk 'NR==2 {print $4}')
+wv_nobackup_space_used=$(df -h /wv/${USER}_nobackup | awk 'NR==2 {print $5}')
+wv_nobackup_space_used=${wv_nobackup_space_used//%/ }
+
+
+printf -v logdate "%(%Y-%m-%d)T"
+
+printf "Date: %s\n" "$logdate"
+printf "The Linux Kernel version: %s\n" "$kernel_version"
+printf "Free Memory:  %s\n" "$freemem"
+
+printf "The $HOME File System is mounted as such: \t%s\n" "$(df -h $HOME | awk 'NR==2 {print $1}')"
+printf "|__ $HOME Free Storage: %s\n" "$home_freespace"
+if [[ $home_space_used -ge 90 ]]; then
+    printf "\t|__ $HOME exceeded 90%% disk utilization (reached $home_space_used%%).\n\tFree disk space for $HOME immediately!\n"
+fi
+
+printf "The /wv/${USER} File System is mounted as such: \t%s\n" "$(df -h /wv/${USER} | awk 'NR==2 {print $1}')"
+printf "|__ /wv/${USER} Free Storage: %s\n" "$wv_freespace"
+if [[ $wv_space_used -ge 90 ]]; then
+    printf "\t|__/wv/${USER} exceeded 90%% disk utilization (reached $wv_space_used%%).\n\tFree disk space for /wv/${USER} immediately!\n"
+fi
+
+printf "The /wv/${USER}_nobackup File System is mounted as such: \t%s\n" "$(df -h /wv/${USER} | awk 'NR==2 {print $1}')"
+printf "|__ /wv/${USER}_nobackup Free Storage: %s\n" "$wv_nobackup_freespace"
+if [[ $wv_nobackup_space_used -ge 90 ]]; then
+    printf "\t|__ /wv/${USER}_nobackup exceeded 90%% disk utilization (reached $wv_nobackup_space_used%%).\n\tFree disk space for /wv/${USER}_nobackup immediately!\n"
+fi
